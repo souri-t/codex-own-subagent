@@ -1,0 +1,46 @@
+site_name: ToDoアプリAPI仕様書
+use_directory_urls: false
+theme:
+  name: material
+  language: ja
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - toc.follow
+
+plugins:
+  - search
+  - i18n:
+      languages:
+        - locale: ja
+          name: 日本語
+          default: true
+          build: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - plantuml_markdown:
+      server: http://plantuml:8080
+  - pymdownx.superfences:
+      custom_fences:
+        - name: plantuml
+          class: plantuml
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - TOP: index.md
+  - API概要: 01-overview/index.md
+  - 共通仕様: 02-common-specifications/index.md
+  - 認証・認可: 03-authentication/index.md
+  - エンドポイント一覧:
+      - 一覧: 04-endpoints/index.md
+      - API-001 タスク一覧取得: 04-endpoints/api-001-get-tasks.md
+      - API-002 タスク詳細取得: 04-endpoints/api-002-get-task-by-id.md
+      - API-003 タスク新規登録: 04-endpoints/api-003-create-task.md
+      - API-004 タスク更新: 04-endpoints/api-004-update-task.md
+      - API-005 タスク削除: 04-endpoints/api-005-delete-task.md
+  - データモデル: 05-data-models/index.md
+  - エラー設計: 06-error-handling/index.md
+  - 付録: 07-appendix/index.md

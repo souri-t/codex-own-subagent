@@ -1,0 +1,45 @@
+site_name: ToDoアプリ外部仕様書
+use_directory_urls: false
+theme:
+  name: material
+  language: ja
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - toc.follow
+
+plugins:
+  - search
+  - drawio
+  - i18n:
+      languages:
+        - locale: ja
+          name: 日本語
+          default: true
+          build: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - plantuml_markdown:
+      server: http://plantuml:8080
+  - pymdownx.superfences:
+      custom_fences:
+        - name: plantuml
+          class: plantuml
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - TOP: index.md
+  - 概要: 01-overview/index.md
+  - システム構成:
+      - 一覧: 02-system-architecture/index.md
+      - ローカルDB ER図: 02-system-architecture/local-db-er.md
+  - 機能仕様: 03-features/index.md
+  - 画面設計:
+      - 一覧: 04-screen-design/index.md
+      - S002 タスク一覧画面: 04-screen-design/s002-task-list.md
+      - S004 タスク登録画面: 04-screen-design/s004-task-create.md
+  - 運用設計: 05-operations/index.md
+  - 付録: 06-appendix/index.md
