@@ -23,4 +23,4 @@
 - draw.io 図は `.drawio` で管理します。
 - 公開用や埋め込み用の画像は `exports/` に分けます。
 - 図の作成方針は `.codex/shared/drawio-guidelines.md` を参照します。
-- PlantUML の設計指針は `~/.codex/skills/plantuml-design/SKILL.md` を参照します。
+- PlantUML の設計指針は `.codex/skills/plantuml-design/SKILL.md` を参照します。

@@ -28,6 +28,11 @@ Codex 用の開発サブエージェント構成を管理するリポジトリ�
   shared/
     design-guidelines.md
     drawio-guidelines.md
+  skills/
+    drawio-designer/
+      SKILL.md
+    plantuml-design/
+      SKILL.md
 docs/
   index.md
   requirements/
@@ -460,18 +465,17 @@ Codex 用エージェント定義の正本を置く場所です。
 
 複数エージェントが共通で参照する設計指針やポリシーを置く場所です。
 
-### `~/.codex/skills/`
+### `.codex/skills/`
 
-Codex の標準的な skill 配置場所です。
+このプロジェクトで管理する skill 配置場所です。
 
 現時点では、以下の skill をこの場所で管理する前提です。
 - `drawio-designer`
 - `plantuml-design`
 
 運用:
-- Codex に自動発見させる skill は `~/.codex/skills/` に配置します。
-- repo 内には skill の正本を置かず、標準配置に寄せます。
-- 更新が必要な場合は `~/.codex/skills/<skill-name>/SKILL.md` を修正します。
+- このプロジェクトで使う skill は `.codex/skills/` に配置します。
+- 更新が必要な場合は `.codex/skills/<skill-name>/SKILL.md` を修正します。
 
 ## 現在の状態
 
@@ -486,7 +490,7 @@ Codex の標準的な skill 配置場所です。
 - `.codex/agents/test-designer.toml`
 - `.codex/shared/design-guidelines.md`
 - `.codex/shared/drawio-guidelines.md`
-- `~/.codex/skills/drawio-designer/SKILL.md`
-- `~/.codex/skills/plantuml-design/SKILL.md`
+- `.codex/skills/drawio-designer/SKILL.md`
+- `.codex/skills/plantuml-design/SKILL.md`
 
 この構成だけで、要件整理から設計、実装、レビュー、テスト設計までを分担できる前提です。

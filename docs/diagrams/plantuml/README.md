@@ -16,4 +16,4 @@
 
 - `.puml` を正本として管理します。
 - 画像化した成果物は `docs/diagrams/exports/` に配置します。
-- 図の作り方は `~/.codex/skills/plantuml-design/SKILL.md` を参照します。
+- 図の作り方は `.codex/skills/plantuml-design/SKILL.md` を参照します。
