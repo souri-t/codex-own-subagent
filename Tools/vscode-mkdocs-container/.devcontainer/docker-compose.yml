@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../../../docs:/workspace:cached
+    command: sleep infinity
+    networks:
+      - mkdocs-net
+
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    expose:
+      - "8080"
+    networks:
+      - mkdocs-net
+
+networks:
+  mkdocs-net:
+    driver: bridge

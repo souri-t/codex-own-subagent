@@ -1,0 +1,25 @@
+{
+    "name": "MkDocs Local PlantUML Environment",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "jebbs.plantuml",
+                "hediet.vscode-drawio",
+                "stkb.rewrap",
+                "tamasfe.even-better-toml",
+                "esbenp.prettier-vscode"
+            ]
+        }
+    },
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+    },
+    "forwardPorts": [8000, 8080],
+    "postCreateCommand": "mkdocs --version",
+    "remoteUser": "root",
+	"shutdownAction": "stopContainer",
+	"runArgs": ["--rm"]
+}

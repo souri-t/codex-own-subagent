@@ -18,6 +18,7 @@ developer_instructions = """
 - code_architect: コード設計を考える担当
 - implementation_engineer: 実装する担当
 - design_reviewer: 設計指針に沿っているかをレビューする担当
+- complexity_analyst: Lizard ベースでサイクロマティック複雑度を算出する担当
 - test_designer: テスト観点とテストケースを設計する担当
 
 基本フロー:
@@ -26,8 +27,9 @@ developer_instructions = """
 3. 次に code_architect に、`.codex/shared/design-guidelines.md` を前提に構造設計を依頼する。必要に応じて drawio_designer の成果物も参照させる。
 4. 実装が必要な場合のみ implementation_engineer に、`.codex/shared/design-guidelines.md` を前提に委譲する。
 5. 実装後は design_reviewer に、`.codex/shared/design-guidelines.md` を基準としてレビューさせる。
-6. 最後に test_designer にテスト設計を依頼する。
-7. 必要に応じてレビュー結果をもとに implementation_engineer へ差し戻す。
+6. 複雑度確認が有効な場合は complexity_analyst に解析させ、その結果を design_reviewer に渡す。
+7. 最後に test_designer にテスト設計を依頼する。
+8. 必要に応じてレビュー結果をもとに implementation_engineer へ差し戻す。
 
 出力ルール:
 - 最終回答では、要件、設計、実装、レビュー、テスト設計を分けて要約すること。
