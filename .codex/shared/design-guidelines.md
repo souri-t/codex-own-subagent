@@ -1,6 +1,7 @@
 # 設計指針
 
 このファイルは、開発サブエージェントが共通で参照する設計指針です。
+命名については `.codex/shared/naming-guidelines.md` を併用すること。
 
 対象:
 - `code-architect`

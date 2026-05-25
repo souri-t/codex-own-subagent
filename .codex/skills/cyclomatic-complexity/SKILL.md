@@ -50,6 +50,30 @@ JSON も保存する場合:
 python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --json-out complexity-report.json
 ```
 
+Markdown レポートを表形式で保存する場合:
+
+```bash
+python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --markdown-out complexity-report.md
+```
+
+差分対象の Markdown レポートを保存する場合:
+
+```bash
+python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --mode diff --git-ref origin/main --threshold 15 --top 20 --markdown-out complexity-diff-report.md
+```
+
+表データを CSV でも保存する場合:
+
+```bash
+python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --csv-out-dir complexity-report-csv
+```
+
+Markdown と CSV を両方保存する場合:
+
+```bash
+python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --mode diff --git-ref origin/main --markdown-out complexity-diff-report.md --csv-out-dir complexity-diff-csv
+```
+
 ## Codex の進め方
 
 1. まず対象範囲を決める
@@ -57,6 +81,8 @@ python3 .codex/skills/cyclomatic-complexity/scripts/analyze_complexity.py --json
 3. 閾値超過と上位 hotspot を確認する
 4. 高複雑度の理由を読み、分割案や条件整理案を提案する
 5. 必要なら `diff` モードで変更影響だけ再確認する
+6. レビューや共有が必要な場合は Markdown レポートを出力する
+7. 表データを二次利用する場合は CSV も出力する
 
 ## 既定の見方
 

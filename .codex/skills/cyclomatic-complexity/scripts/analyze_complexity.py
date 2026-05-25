@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import subprocess
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
@@ -74,6 +76,16 @@ def parse_args() -> argparse.Namespace:
         "--json-out",
         type=Path,
         help="Optional JSON output path.",
+    )
+    parser.add_argument(
+        "--markdown-out",
+        type=Path,
+        help="Optional Markdown report output path.",
+    )
+    parser.add_argument(
+        "--csv-out-dir",
+        type=Path,
+        help="Optional output directory for CSV tables.",
     )
     parser.add_argument(
         "--exclude-dir",
@@ -239,6 +251,212 @@ def summarize(results: list[dict], threshold: int, top: int) -> str:
     return "\n".join(lines)
 
 
+def format_markdown_table(rows: list[list[str]]) -> str:
+    if not rows:
+        return ""
+    header = "| " + " | ".join(rows[0]) + " |"
+    separator = "| " + " | ".join("---" for _ in rows[0]) + " |"
+    body = ["| " + " | ".join(row) + " |" for row in rows[1:]]
+    return "\n".join([header, separator, *body])
+
+
+def top_hotspots(results: list[dict], limit: int) -> list[dict]:
+    return sorted(
+        results,
+        key=lambda item: (item["cyclomatic_complexity"], item["nloc"], item["token_count"]),
+        reverse=True,
+    )[:limit]
+
+
+def threshold_hits(results: list[dict], threshold: int) -> list[dict]:
+    return sorted(
+        [entry for entry in results if entry["cyclomatic_complexity"] >= threshold],
+        key=lambda item: (item["cyclomatic_complexity"], item["file"], item["start_line"]),
+        reverse=True,
+    )
+
+
+def build_markdown_report(
+    *,
+    results: list[dict],
+    files: list[Path],
+    mode: str,
+    git_ref: str | None,
+    threshold: int,
+    top: int,
+) -> str:
+    hits = threshold_hits(results, threshold)
+    hotspots = top_hotspots(results, top)
+    language_counts = Counter(entry["language"] for entry in results)
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    lines = [
+        "# Cyclomatic Complexity Report",
+        "",
+        "## Summary",
+        "",
+        format_markdown_table(
+            [
+                ["Item", "Value"],
+                ["Generated At", generated_at],
+                ["Mode", mode],
+                ["Git Ref", git_ref or "-"],
+                ["Files Analyzed", str(len(files))],
+                ["Functions Analyzed", str(len(results))],
+                ["Threshold", str(threshold)],
+                ["Threshold Hits", str(len(hits))],
+                ["Languages", ", ".join(f"{lang}={count}" for lang, count in sorted(language_counts.items())) or "-"],
+            ]
+        ),
+        "",
+        "## Top Hotspots",
+        "",
+    ]
+
+    if hotspots:
+        lines.extend(
+            [
+                format_markdown_table(
+                    [
+                        ["Rank", "CC", "Severity", "Language", "Symbol", "File", "Line", "NLOC", "Params"],
+                        *[
+                            [
+                                str(index),
+                                str(entry["cyclomatic_complexity"]),
+                                entry["severity"],
+                                entry["language"],
+                                f"`{entry['symbol']}`",
+                                f"`{entry['file']}`",
+                                str(entry["start_line"]),
+                                str(entry["nloc"]),
+                                str(entry["parameter_count"]),
+                            ]
+                            for index, entry in enumerate(hotspots, start=1)
+                        ],
+                    ]
+                ),
+                "",
+            ]
+        )
+    else:
+        lines.extend(["No functions were analyzed.", ""])
+
+    lines.extend(["## Threshold Hits", ""])
+    if hits:
+        lines.extend(
+            [
+                format_markdown_table(
+                    [
+                        ["CC", "Severity", "Language", "Symbol", "File", "Line", "NLOC", "Tokens"],
+                        *[
+                            [
+                                str(entry["cyclomatic_complexity"]),
+                                entry["severity"],
+                                entry["language"],
+                                f"`{entry['symbol']}`",
+                                f"`{entry['file']}`",
+                                str(entry["start_line"]),
+                                str(entry["nloc"]),
+                                str(entry["token_count"]),
+                            ]
+                            for entry in hits
+                        ],
+                    ]
+                ),
+                "",
+            ]
+        )
+    else:
+        lines.extend([f"No functions exceeded the threshold ({threshold}).", ""])
+
+    lines.extend(["## Files Analyzed", ""])
+    lines.extend([f"- `{relative_to_cwd(path)}`" for path in files])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def write_csv(path: Path, header: list[str], rows: list[list[str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(header)
+        writer.writerows(rows)
+
+
+def write_csv_reports(
+    *,
+    output_dir: Path,
+    results: list[dict],
+    files: list[Path],
+    mode: str,
+    git_ref: str | None,
+    threshold: int,
+    top: int,
+) -> list[Path]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    hits = threshold_hits(results, threshold)
+    hotspots = top_hotspots(results, top)
+    language_counts = Counter(entry["language"] for entry in results)
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    summary_path = output_dir / "summary.csv"
+    write_csv(
+        summary_path,
+        ["item", "value"],
+        [
+            ["generated_at", generated_at],
+            ["mode", mode],
+            ["git_ref", git_ref or "-"],
+            ["files_analyzed", str(len(files))],
+            ["functions_analyzed", str(len(results))],
+            ["threshold", str(threshold)],
+            ["threshold_hits", str(len(hits))],
+            ["languages", ", ".join(f"{lang}={count}" for lang, count in sorted(language_counts.items())) or "-"],
+        ],
+    )
+
+    hotspots_path = output_dir / "top_hotspots.csv"
+    write_csv(
+        hotspots_path,
+        ["rank", "cc", "severity", "language", "symbol", "file", "line", "nloc", "params"],
+        [
+            [
+                str(index),
+                str(entry["cyclomatic_complexity"]),
+                entry["severity"],
+                entry["language"],
+                entry["symbol"],
+                entry["file"],
+                str(entry["start_line"]),
+                str(entry["nloc"]),
+                str(entry["parameter_count"]),
+            ]
+            for index, entry in enumerate(hotspots, start=1)
+        ],
+    )
+
+    threshold_hits_path = output_dir / "threshold_hits.csv"
+    write_csv(
+        threshold_hits_path,
+        ["cc", "severity", "language", "symbol", "file", "line", "nloc", "tokens"],
+        [
+            [
+                str(entry["cyclomatic_complexity"]),
+                entry["severity"],
+                entry["language"],
+                entry["symbol"],
+                entry["file"],
+                str(entry["start_line"]),
+                str(entry["nloc"]),
+                str(entry["token_count"]),
+            ]
+            for entry in hits
+        ],
+    )
+
+    return [summary_path, hotspots_path, threshold_hits_path]
+
+
 def main() -> int:
     args = parse_args()
     ensure_lizard()
@@ -274,6 +492,35 @@ def main() -> int:
             encoding="utf-8",
         )
         print(f"\nJSON report written to {args.json_out}")
+
+    if args.markdown_out:
+        args.markdown_out.write_text(
+            build_markdown_report(
+                results=results,
+                files=files,
+                mode=args.mode,
+                git_ref=args.git_ref if args.mode == "diff" else None,
+                threshold=args.threshold,
+                top=args.top,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        print(f"Markdown report written to {args.markdown_out}")
+
+    if args.csv_out_dir:
+        csv_paths = write_csv_reports(
+            output_dir=args.csv_out_dir,
+            results=results,
+            files=files,
+            mode=args.mode,
+            git_ref=args.git_ref if args.mode == "diff" else None,
+            threshold=args.threshold,
+            top=args.top,
+        )
+        print("CSV tables written to:")
+        for path in csv_paths:
+            print(f"- {path}")
 
     return 0
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Naming Review"
+  short_description: "Review names against the shared naming guidelines"
+  default_prompt: "Review these names or this diff against the repository naming guidelines and suggest concrete renames with reasons."
