@@ -31,6 +31,8 @@ Codex 用の開発サブエージェント構成を管理するリポジトリ�
   skills/
     drawio-designer/
       SKILL.md
+    mkdocs-writer/
+      SKILL.md
     plantuml-design/
       SKILL.md
 docs/
@@ -471,6 +473,7 @@ Codex 用エージェント定義の正本を置く場所です。
 
 現時点では、以下の skill をこの場所で管理する前提です。
 - `drawio-designer`
+- `mkdocs-writer`
 - `plantuml-design`
 
 運用:
@@ -491,6 +494,7 @@ Codex 用エージェント定義の正本を置く場所です。
 - `.codex/shared/design-guidelines.md`
 - `.codex/shared/drawio-guidelines.md`
 - `.codex/skills/drawio-designer/SKILL.md`
+- `.codex/skills/mkdocs-writer/SKILL.md`
 - `.codex/skills/plantuml-design/SKILL.md`
 
 この構成だけで、要件整理から設計、実装、レビュー、テスト設計までを分担できる前提です。

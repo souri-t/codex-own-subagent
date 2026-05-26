@@ -1,0 +1,4 @@
+interface:
+  display_name: "MkDocs Writer"
+  short_description: "Write MkDocs docs from repo samples consistently"
+  default_prompt: "Use $mkdocs-writer to create or revise MkDocs pages by following the repository sample documents and keeping the structure consistent."
